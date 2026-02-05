@@ -1,27 +1,9 @@
-import { useAuth } from "@clerk/clerk-react";
-import axiosInstance from "./axios";
-import { useEffect } from "react";
+import axios from "axios";
 
-const useAxios = () => {
-  const { getToken } = useAuth();
+const axiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  // ❌ do NOT use withCredentials in production
+});
 
-  useEffect(() => {
-    const interceptor = axiosInstance.interceptors.request.use(
-      async (config) => {
-        const token = await getToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      }
-    );
+export default axiosInstance;
 
-    return () => {
-      axiosInstance.interceptors.request.eject(interceptor);
-    };
-  }, [getToken]);
-
-  return axiosInstance;
-};
-
-export default useAxios;
