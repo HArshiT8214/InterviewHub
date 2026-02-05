@@ -1,20 +1,27 @@
-import axios from "axios";
-import { getAuth } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/clerk-react";
+import axiosInstance from "./axios";
+import { useEffect } from "react";
 
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
+const useAxios = () => {
+  const { getToken } = useAuth();
 
-// ✅ Attach Clerk token to every request
-axiosInstance.interceptors.request.use(async (config) => {
-  const auth = getAuth();
-  const token = await auth?.getToken();
+  useEffect(() => {
+    const interceptor = axiosInstance.interceptors.request.use(
+      async (config) => {
+        const token = await getToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      }
+    );
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+    return () => {
+      axiosInstance.interceptors.request.eject(interceptor);
+    };
+  }, [getToken]);
 
-  return config;
-});
+  return axiosInstance;
+};
 
-export default axiosInstance;
+export default useAxios;
