@@ -1,7 +1,7 @@
 
 import { useAxios } from "../lib/useAxios.js";
 
-export const useSessionApi = () => {
+export const sessionApi = () => {
   const axios = useAxios();
 
   return {
