@@ -6,7 +6,7 @@ export const sessionApi = () => {
 
   return {
     createSession: (data) =>
-      axios.post("/api/sessions/create", data).then((res) => res.data),
+      axios.post("/api/sessions", data).then((res) => res.data),
 
     getActiveSessions: () =>
       axios.get("/api/sessions/active").then((res) => res.data),
