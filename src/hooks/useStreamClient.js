@@ -21,7 +21,11 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
       if (session.status === "completed") return;
 
       try {
-        const { token, userId, userName, userImage } = await sessionApi.getStreamToken();
+        // 🔑 FIX: CALL THE FACTORY
+        const api = sessionApi();
+
+        const { token, userId, userName, userImage } =
+          await api.getStreamToken();
 
         const client = await initializeStreamClient(
           {
@@ -49,14 +53,18 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
           },
           token
         );
+
         setChatClient(chatClientInstance);
 
-        const chatChannel = chatClientInstance.channel("messaging", session.callId);
+        const chatChannel = chatClientInstance.channel(
+          "messaging",
+          session.callId
+        );
         await chatChannel.watch();
         setChannel(chatChannel);
       } catch (error) {
         toast.error("Failed to join video call");
-        console.error("Error init call", error);
+        console.error("Error init call:", error);
       } finally {
         setIsInitializingCall(false);
       }
@@ -64,13 +72,12 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
 
     if (session && !loadingSession) initCall();
 
-    // cleanup - performance reasons
     return () => {
-      // iife
       (async () => {
         try {
           if (videoCall) await videoCall.leave();
-          if (chatClientInstance) await chatClientInstance.disconnectUser();
+          if (chatClientInstance)
+            await chatClientInstance.disconnectUser();
           await disconnectStreamClient();
         } catch (error) {
           console.error("Cleanup error:", error);
