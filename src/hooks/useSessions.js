@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { sessionApi } from "../api/sessions";
+import { useSessionApi } from "../api/sessions";
 
 export const useCreateSession = () => {
-  const api = sessionApi(); // ✅ CALL IT
+  const api = useSessionApi(); // ✅ CALL IT
 
   return useMutation({
     mutationKey: ["createSession"],
@@ -17,7 +17,7 @@ export const useCreateSession = () => {
 };
 
 export const useActiveSessions = () => {
-  const api = sessionApi();
+  const api = useSessionApi();
 
   return useQuery({
     queryKey: ["activeSessions"],
@@ -26,7 +26,7 @@ export const useActiveSessions = () => {
 };
 
 export const useMyRecentSessions = () => {
-  const api = sessionApi();
+  const api = useSessionApi();
 
   return useQuery({
     queryKey: ["myRecentSessions"],
@@ -35,7 +35,7 @@ export const useMyRecentSessions = () => {
 };
 
 export const useSessionById = (id) => {
-  const api = sessionApi();
+  const api = useSessionApi();
 
   return useQuery({
     queryKey: ["session", id],
@@ -46,7 +46,7 @@ export const useSessionById = (id) => {
 };
 
 export const useJoinSession = () => {
-  const api = sessionApi();
+  const api = useSessionApi();
 
   return useMutation({
     mutationKey: ["joinSession"],
@@ -60,7 +60,7 @@ export const useJoinSession = () => {
 };
 
 export const useEndSession = () => {
-  const api = sessionApi();
+  const api = useSessionApi();
 
   return useMutation({
     mutationKey: ["endSession"],

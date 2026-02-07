@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { StreamChat } from "stream-chat";
 import toast from "react-hot-toast";
 import { initializeStreamClient, disconnectStreamClient } from "../lib/stream";
-import { sessionApi } from "../api/sessions";
+import { useSessionApi } from "../api/sessions";
 
 function useStreamClient(session, loadingSession, isHost, isParticipant) {
+  const api = useSessionApi(); // ✅ VALID HOOK USAGE
+
   const [streamClient, setStreamClient] = useState(null);
   const [call, setCall] = useState(null);
   const [chatClient, setChatClient] = useState(null);
@@ -21,18 +23,11 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
       if (session.status === "completed") return;
 
       try {
-        // 🔑 FIX: CALL THE FACTORY
-        const api = sessionApi();
-
         const { token, userId, userName, userImage } =
           await api.getStreamToken();
 
         const client = await initializeStreamClient(
-          {
-            id: userId,
-            name: userName,
-            image: userImage,
-          },
+          { id: userId, name: userName, image: userImage },
           token
         );
 
@@ -46,11 +41,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         chatClientInstance = StreamChat.getInstance(apiKey);
 
         await chatClientInstance.connectUser(
-          {
-            id: userId,
-            name: userName,
-            image: userImage,
-          },
+          { id: userId, name: userName, image: userImage },
           token
         );
 
@@ -84,7 +75,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         }
       })();
     };
-  }, [session, loadingSession, isHost, isParticipant]);
+  }, [session, loadingSession, isHost, isParticipant, api]);
 
   return {
     streamClient,
